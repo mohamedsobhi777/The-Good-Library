@@ -1,0 +1,25 @@
+
+
+ll tri(ll x){
+	return 1ll * x * (x + 1) / 2 ; 
+}
+
+ll squ(ll x){
+	return 1ll * x * x ; 
+}
+
+ll pen(ll x){
+	return 1ll * x * (3 * x - 1) / 2 ; 
+}
+
+ll hex(ll x){
+	return 1ll * x * (2 * x - 1) ; 
+}
+
+ll hep(ll x){
+	return 1ll * x * (5 * x - 3 ) / 2 ;
+}
+
+ll oct(ll x){
+	return 1ll * x * (3 * x - 2) ; 
+}

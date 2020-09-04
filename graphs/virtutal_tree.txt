@@ -1,0 +1,168 @@
+/*
+  Given queries of the form 
+  k 
+  v1, v2 , v3 , ... , vk
+  
+  calculate the sum of the lengths of all the shortest paths between pairs of nodes for each pair (vi , vj)
+  
+
+*/
+
+#include <bits/stdc++.h>
+
+#pragma GCC optimize("-Ofast")
+//#pragma GCC optimize("trapv")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,sse4.2,popcnt,abm,mmx,avx2,tune=native")
+#pragma GCC optimize("-ffast-math")
+#pragma GCC optimize("-funroll-loops")
+
+#define I inline void
+#define S struct
+#define vi vector<ll>
+#define vii vector<pair<ll, ll>>
+
+using namespace std;
+using ll = long long;
+using ld = long double;
+
+const ll N = 1e5 + 7, mod = 1e9 + 7;
+
+// How interesting!
+
+int n ; 
+
+int hei[N] , sz[N] ; 
+int st[N] , en[N] ; 
+int cnt[N] ; 
+int imp[N] ; 
+int tim ; 
+int up[N][20] ; 
+
+vector<int> adj[N] , adj_aux[N]  ;
+
+I dfz(int x , int p){
+
+	st[x] = ++ tim ; 
+	hei[x] = hei[p] + 1 ; 
+
+	up[x][0] = p ; 
+	for(int i =1 ; i< 20 ;i++)
+		up[x][i] = up[ up[x][i-1]][i-1] ; 
+
+	for(auto u : adj[x]){
+		if(u != p){
+			dfz(u , x) ;
+		}
+	}
+
+	en[x] = ++ tim ; 
+
+}
+
+
+bool upper(int u , int v){
+      return st[v] >= st[u] && en[v] <= en[u] ; 
+}
+
+int lca(int u , int v){
+      if(upper(u , v))
+            return u ; 
+      if(upper(v , u))
+            return v ; 
+      for(int i = 19 ; ~ i ; -- i)
+            if(!upper(up[u][i] , v))
+                  u = up[u][i] ;
+      return up[u][0] ; 
+}
+
+bool cmp(int u , int v){
+      return st[u] < st[v] ; 
+}
+
+int total = 0 ; 
+ll ans = 0 ; 
+
+I solve(int x){
+      cnt[x] = imp[x] ; 
+      for(auto u : adj_aux[x]){
+            solve(u) ;
+            cnt[x] += cnt[u] ;
+            ll dh = hei[u] - hei[x] ; 
+            ans += 1ll * dh *  cnt[u] * (total - cnt[u]) ; 
+      }
+      
+}
+
+int build_aux(vector<int> &vec){
+      total = (int) vec.size() ; 
+      
+      sort(vec.begin() , vec.end() , cmp ) ; 
+      for(int i = 1 ;i < total ; i++){
+            vec.push_back(lca(vec[i] , vec[i-1])) ; 
+      }
+
+      sort(vec.begin() , vec.end() , cmp ) ; 
+      vec.erase(unique(vec.begin() , vec.end()) , vec.end()) ; 
+
+      
+      vector<int> aux = {vec[0]} ; 
+
+      for(int i = 1; i< (int) vec.size() ; i ++){
+            int v = vec[i] ; 
+
+            while(aux.size() >= 2 && !upper(aux.back() , v)){
+                  adj_aux[aux[aux.size() - 2]].push_back(aux.back()) ; 
+                  aux.pop_back() ; 
+            }
+            aux.push_back(v) ; 
+      }
+      while(aux . size() >= 2){
+            adj_aux[aux[aux.size() - 2]].push_back(aux.back()) ; 
+            aux.pop_back() ; 
+      }
+      solve(aux[0]) ;
+      cout<< ans <<"\n" ; 
+      
+      for(int u = 1; u <= n; u ++){
+            adj_aux[u].clear() ;
+            cnt[u] =0 ; 
+            imp[u] = 0 ; 
+      } 
+      return aux[0] ; 
+}
+
+int main()
+{
+        ios_base::sync_with_stdio(0);
+        cin.tie(0);
+
+        cin >> n ; 
+      for(int i = 0 ;i < n - 1; i++){
+              	int u , v ; 
+        	cin >> u >> v ; 
+        	adj[u].push_back(v) ; 
+        	adj[v].push_back(u) ; 
+        }
+      
+        dfz(1 , 1) ;
+        
+        int k ; 
+        cin >> k ; 
+        for(int i = 0 ;i < k ;i++){
+            ans = 0 ; 
+            memset(imp , 0 , sizeof imp) ; 
+            //memset(up , 0 , sizeof up) ; 
+            tim = 0 ; 
+        	int t ;
+        	cin >> t ; 
+        	vector<int> nds ; 
+        	for(int j = 0 ;j < t ;j ++){
+        		int x ;
+        		cin >> x;  
+        		nds.push_back(x) ;
+        		imp[x] = 1; 
+        	}
+        	int root = build_aux(nds) ; 
+        }
+	return 0;
+}

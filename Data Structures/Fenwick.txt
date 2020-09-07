@@ -1,0 +1,32 @@
+int bit[N] ; 
+
+I add(int x , int v){
+	for(;x<N;x+=x&-x)
+		bit[x] += v ; 
+}
+
+int upto(int x){
+	int ret = 0 ; 
+	for(;x;x-=x&-x)
+		ret+= bit[x] ; 
+	return ret ; 
+}
+
+int get(int l , int r){
+	return upto(r) - upto(l -1) ; 
+}
+
+int lower_bound(int x){
+	int sum = 0 ; 
+	int cur = 0 ; 
+	for(int i = 20 ; ~ i ;i -- ){
+		if(cur + (1<<i) >= N)
+			continue ;
+		if(sum + bit[cur + (1<<i)] < x ){
+			sum += bit[cur + (1<<i)] ; 
+			cur += (1<<i) ;
+		}
+	}
+
+	return cur + 1; 
+}

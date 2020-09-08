@@ -1,5 +1,15 @@
 int bit[N] ; 
 
+I init(){
+	// offline initializaion in O(N)
+	for(int i = 1 ;i <= n;i++){
+		bit[i] += a[i] ; 
+		int nxt = i + (i & - i) ; 
+		if(nxt < N)
+			bit[nxt] += bit[i] ;
+	}
+}
+
 I add(int x , int v){
 	for(;x<N;x+=x&-x)
 		bit[x] += v ; 

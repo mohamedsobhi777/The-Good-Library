@@ -11,14 +11,16 @@ I init(){
 }
 
 I add(int x , int v){
-	for(;x<N;x+=x&-x)
+	//for(;x<N;x+=x&-x)
+	for(;x<N;x = x|(x + 1) )
 		bit[x] += v ; 
 }
 
 int upto(int x){
 	int ret = 0 ; 
-	for(;x;x-=x&-x)
-		ret+= bit[x] ; 
+	//for(;x;x-=x&-x)
+		for(;~x;x = (x&(x+1)) - 1)
+			ret+= bit[x] ; 
 	return ret ; 
 }
 

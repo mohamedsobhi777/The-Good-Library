@@ -1,0 +1,204 @@
+#include <bits/stdc++.h>
+
+#pragma GCC optimize("-Ofast")
+//#pragma GCC optimize("trapv")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,sse4.2,popcnt,abm,mmx,avx2,tune=native")
+#pragma GCC optimize("-ffast-math")
+#pragma GCC optimize("-funroll-loops")
+
+#define I inline void 
+#define S struct 
+#define vi vector<int> 
+#define vii vector<pair<int,int>>
+
+using namespace std ; 
+using ll = long long ; 
+using ld = long double ; 
+
+const int N = 1e6 + 7 , mod = 1e9 + 7 ; 
+const int inf = 2e9 ; 
+// How interesting!
+
+int n , m , k ; 
+vector<int> fac[N]; 
+int a[N] , b[N]; 
+bool p[N] ;
+int tab[N][20] ; 
+int L[N] , R[N] , Q[N]; 
+int fL[N] , fR[N] ; 
+int ans[N] ; 
+int lg[N] ; 
+
+I init(){
+	for(int i = 2; i < N ;i++){
+		if(p[i])
+			continue ; 
+		fac[i] = {i} ;
+		for(int j = i + i ;j < N ;j += i ){
+			p[j] = 1; 
+			fac[j].push_back(i) ;
+		}
+	}
+}
+
+struct query{
+	int l ;
+	int ix ; 
+	query(){}
+	query(int _ix , int _l) : l(_l) , ix(_ix){}
+} ;
+vector<query> q[N] ; 
+
+int get(int l , int r){
+	int g = lg[r - l +1] ; 
+	return max(tab[l][g] , tab[r - (1<<g) + 1][g]) ;
+}
+
+bool cop(int l , int r){
+	return get(l , r) <= l ; 
+}
+
+vector<pair<int,int>>qs ; 
+vector<int> del[N] ;
+int seg[N] ; 
+
+int tree[N * 4] ;
+
+I update(int node ,int L ,int R , int ix , int val){
+	if(L == R){
+		tree[node] = max(tree[node], val) ;
+		return ; 
+	}
+	int mid = (L + R) >> 1 ;
+	if(ix<=mid)update(node * 2 + 1 , L , mid , ix , val) ; 
+	else update(node*2+2 , mid+1 , R , ix , val) ; 
+	tree[node] = max(tree[node*2+1] , tree[node*2+2]) ; 
+}
+
+int rsq(int node, int L , int R , int l, int r){
+	if(l > r || l > R || r < L)
+		return 0 ;
+	if(L>=l&&R<=r)
+		return tree[node] ; 
+	int mid = (L + R) >> 1; 
+	int s1 = rsq(node*2+1 , L , mid , l, r) ; 
+	int s2 = rsq(node*2+2 , mid+1 , R , l ,r ) ; 
+	return max(s1 ,s2) ; 
+}
+
+vector<int> add[N] , de[N]; 
+
+I build(){
+	vector<pair<int, pair<int,int>  >>vs ; 
+	for(int i =1 ;i<= n;i++){
+		vs.push_back({R[i], {0 , i } }) ;
+		vs.push_back({i , { 1 , Q[i]} }) ; 
+	}
+	for(int i = 0 ;i < k ;i++){
+		vs.push_back({qs[i].second , {2 , i}}) ; 
+	}
+	sort(vs.begin() , vs.end()) ;
+	for(auto u : vs){
+		int x = u.first , id = u.second.first , pos = u.second.second ;
+		if(id < 2){
+			update(0 , 1 , N , pos , u.first - pos +1) ; 
+		}
+		else{
+			ans[pos] = rsq(0 , 1 , N , qs[pos].first , qs[pos].second) ;  
+		}
+	}
+}
+
+int main(){
+	ios_base::sync_with_stdio(0) ; 
+	cin.tie(0) ;
+
+	//freopen("in.in" , "r" , stdin) ;
+	init() ;
+	cin >> n;  
+	for(int i = 1; i<= n;i++){
+		cin >> a[i]; 
+	}
+
+	for(int i = 2 ;i < N ;i ++)
+		lg[i] = lg[i / 2] + 1; 
+
+	for(int i = 1; i <= n;i++){
+		for(auto u : fac[a[i]]){
+			L[i] = max(L[i] , fL[u] + 1) ; 
+			fL[u] = i ; 
+		}
+		tab[i][0] = L[i] ; 
+	}
+
+	for(int j = 1;j < 20 ;j ++){
+		for(int i = 1;i + (1<<j) <= n + 1;i++){
+			tab[i][j] = max(tab[i][j-1] , tab[ i + (1<<(j-1)) ][j-1]) ;
+		}
+	}
+
+	for(int i =1 ;i <= n;i++){
+		int lo = i, hi = n ;
+		while(lo <= hi){
+			int mid = (lo + hi) >> 1 ; 
+			if(cop(i , mid)){
+				R[i] = mid ;
+				lo = mid + 1; 
+			}
+			else{
+				hi = mid - 1; 
+			}
+		}
+	}
+
+	for(int i =1 ;i <= n;i++){
+		int lo = 1, hi = i ;
+		while(lo <= hi){
+			int mid = (lo + hi) >> 1 ; 
+			if(cop(mid , i)){
+				Q[i] = mid ;
+				hi = mid - 1; 
+			}
+			else{
+				lo = mid + 1; 
+			}
+		}
+	}
+
+	for(int i =1 ;i<= n; i++){
+		add[i].push_back(i) ; 
+		del[R[i]].push_back(i) ; 
+
+		add[Q[i]].push_back(Q[i]) ; 
+		del[i].push_back(Q[i]) ;
+	}
+
+	cin >> k ; 
+	for(int i = 0;i < k ; ++ i){
+		int l , r ; 
+		cin >> l >> r; 
+		qs.push_back({l , r}) ;
+		q[r].push_back(query(i , l)) ;
+	}
+	build() ; 
+	multiset<int> mulr ; 
+	for(int i = 1 ;i <= n;i++){
+		for(auto u : add[i])
+			mulr.insert(u) ; 
+		for(auto u : q[i]){	
+			int l = u.l ; 
+			int ix = u.ix ;
+			if(mulr.size())
+				if((*mulr.begin()) <= l)
+				ans[ix] = max(ans[ix] , i - l + 1 ) ;
+		
+		}
+		for(auto u : del[i])
+			mulr.erase(mulr.find(u)) ; 
+	}
+
+	for(int i = 0 ;i < k ; ++ i)
+		cout<< ans[i] <<"\n" ;
+
+	return 0 ; 
+}

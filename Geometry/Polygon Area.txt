@@ -1,0 +1,14 @@
+
+using ld = long double ; 
+typedef complex<ld> cd ; 
+
+ld polyarea(vector<cd> poly){
+	ld ret = 0 ; 
+	int sz = (int) poly.size() ; 
+	for(int i = 0 ;i < sz ; ++ i){
+		int j = (i + 1) % sz ; 
+		ret += (ld) poly[i].real() * poly[j].imag() ; 
+		ret -= (ld) poly[i].imag() * poly[j].real() ; 
+	}
+	return abs(ret) /2 ; 
+}

@@ -1,0 +1,66 @@
+/*
+        Problem Name : Bajtolini (BAJ)
+        Problem Link : https://szkopul.edu.pl/c/ioi-2020-training/p/baj1/
+        Score : 100
+*/
+
+#include<bits/stdc++.h>
+using namespace std ; 
+
+const int N = 10000 + 3 ; 
+
+// How interesting!
+
+short n , m; 
+short nxt[N][26] ; 
+short dp[2][N] ; 
+short inf = N + 1; 
+string s , t ; 
+
+int main(){
+	ios_base::sync_with_stdio(0) ; 
+	cin.tie(0) ;
+	//freopen("in.in" , "r" , stdin) ;
+
+	cin >> n >> m; 
+	cin >> s >> t ;
+	s = '#' + s ; 
+	t = '#' + t ; 
+
+	for(int i = m ; i >= 0  ;i-- ){
+		for(int j = 0 ;j < 26 ;j ++){
+
+			nxt[i][j] = m + 1 ; 
+			if(i < m){
+				nxt[i][j] = nxt[i+1][j] ; 
+				if(t[i+1] - 'a' == j){
+					nxt[i][j] = i + 1; 
+				}
+			}
+		}
+	}
+
+	dp[0][0] = 0 ; 
+	int ret = inf  ; 
+
+	for(int i = 1 ; i <= n; i++){
+		int c = s[i] - 'a' ; 
+		int now = (i - 1) & 1 , prv = i & 1; 
+
+		for(int j = 0 ;j <= i ;j ++){
+			dp[now][j] = dp[prv][j] ; 
+			if(j){
+				dp[now][j] = max(dp[now][j] ,  nxt[ dp[prv][j-1] ][ c ] ) ; 
+			}
+			if(dp[now][j] == m + 1)
+				ret = min(ret , j ) ; 
+		}
+	}	
+
+	if(ret == inf)
+		cout<<"NIE" ; 
+	else 
+		cout<< ret ; 
+
+	return 0 ; 
+}

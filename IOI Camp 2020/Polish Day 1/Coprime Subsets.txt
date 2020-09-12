@@ -1,0 +1,119 @@
+/*
+        Problem Name : Coprime Subsets (POD)
+        Problem Link : https://szkopul.edu.pl/c/ioi-2020-training/p/pod1/
+        Score : 100
+*/
+
+#include<bits/stdc++.h>
+//#pragma GCC optimize("trapv")
+#define I inline void 
+#define S struct 
+#define vi vector<int> 
+#define vii vector<pair<int,int>>
+
+using namespace std ; 
+using ll = long long ; 
+using ld = long double ; 
+
+const int N = 3000 + 7 , mod = 1e9 + 7 ; 
+
+// How interesting!
+
+ll n , m; 
+
+int masks[N] ; 
+
+bool isprime(int x){
+	for(int i = 2; i * i <= x ;i ++){
+		if(x%i == 0)
+			return 0 ; 
+	}
+	return 1 ; 
+}
+
+vector<int> small, big ; 
+
+int cur = 0 ; 
+
+vector<int> dp ; 
+
+int divisible(int x){
+	int ret = 0 ; 
+	for(int i = 0 ;i < (int) small.size() ;i ++){
+		if(x%small[i] == 0)
+			ret|=(1<<i) ; 
+	}
+	return ret ; 
+}
+
+bool dbb(int x){
+	for(auto u : big)
+		if(x%u == 0)
+			return 1 ; 
+	return 0 ; 
+}
+
+int main(){
+	ios_base::sync_with_stdio(0) ; 
+	cin.tie(0) ;
+	//freopen("in.in" , "r" , stdin) ;
+
+	cin >> n >> m ;
+
+	int sq = 0 ;
+	while(sq * sq<= n)
+		sq++ ; 
+	for(int i = 2 ;i <= n ;i++){
+		if(isprime(i)){
+			if(i <= sq)
+				small.push_back(i) ; 
+			else 
+				big.push_back(i) ; 
+		}
+	}
+
+	for(int i =1 ;i <= n;i++){
+		masks[i] = divisible(i) ; 
+	}
+
+	int p = small.size() ; 
+	dp.resize( (1<< (p) ) ) ; 
+	dp[0] = 1 ; 
+	for(int i =1 ;i <=n;i++){
+		if(!dbb(i)){
+
+			vector<int> new_dp = dp ; 
+			for(int j = 0 ;j < (1<< p) ; j++){
+				int msk = masks[i] ; 
+				int nw = (j|msk) ; 
+				if( (msk&j) == 0){
+					new_dp[nw] += dp[j] ; 
+
+					if(new_dp[nw] >= m)
+						new_dp[nw] -= m ;
+				}
+			}
+			dp = new_dp ; 
+		}
+	}	
+
+	for(auto u: big){
+		vector<int> new_dp = dp ; 
+		for(int i = u ; i<= n ; i += u){
+			for(int j = 0 ;j < (1<< p) ; j++){
+				int msk = masks[i] ; 
+				int nw = (j|msk) ; 
+				if( (msk&j) == 0){
+					new_dp[(j|msk)] += dp[j] ; 
+					if(new_dp[nw] >= m)
+						new_dp[nw] -= m ;
+				}
+			}	
+		}	
+		dp = new_dp ; 
+	}
+
+	cout<< accumulate(dp.begin() , dp.end() , 0LL) % m ; 
+
+	return 0 ; 
+}

@@ -1,0 +1,110 @@
+/*
+        Problem Name : Packages (PAC)
+        Problem Link : https://szkopul.edu.pl/c/ioi-2020-training/p/pac/
+        Score : 100
+        Complexity : O(N * log^2(N))
+*/
+
+#include<bits/stdc++.h>
+/*
+#pragma GCC optimize("-Ofast")
+//#pragma GCC optimize("trapv")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,sse4.2,popcnt,abm,mmx,avx2,tune=native")
+#pragma GCC optimize("-ffast-math")
+#pragma GCC optimize("-funroll-loops")*/
+
+#define I inline void 
+#define S struct 
+#define vi vector<int> 
+#define vii vector<pair<int,int>>
+#define pii pair<int,int>
+#define pll pair<ll,ll>
+
+using namespace std ; 
+using ll = long long ; 
+using ld = long double ; 
+
+const int N = 5e5 + 7 , mod = 1e9 + 7 ; 
+const int inf = N ; 
+// How interesting!
+
+int n; 
+ll s; 
+multiset<pll> mul ; 
+vector<pll>v ; 
+
+bool check(ll x){
+        ll ret = 0 ;
+        mul.clear() ;       
+        map< ll , ll > occ ;
+        ll pw = 0 ; 
+        int i = 0 ; 
+        for(int j = 60 ; ~j ; -- j){
+                ll paw = (1LL<<j) ;
+                if(x&paw){
+                        occ[0]++;
+                } 
+                for(;i < n;i++){
+                        if(v[i].first == paw){
+                                if(occ.empty())
+                                        continue ;
+                                auto it = occ.begin() ; 
+                                ll p1 = (*it).first ; 
+                                ll p2 = (*it).second ; 
+                                ll op1 = p1 ; 
+                                assert(p2) ; 
+                                p1 = max(p1 , v[i].second) ;
+                                occ[op1]-- ;
+                                occ[p1]++;
+                                ret += (p1 - op1) * paw ; 
+                                while(occ.size() && !(*occ.begin()).second){
+                                        occ.erase(occ.begin()) ;
+                                }
+                        }else
+                                break ;
+                }
+                for(auto &u : occ){
+                        u.second *= 2ll ; 
+                }
+        }      
+        return ret >= s ; 
+}
+
+bool cmp(pll a, pll b){
+        if(a.first == b.first)
+                return a.second > b.second ; 
+        return a.first > b.first ; 
+}
+
+int main(){
+        ios_base::sync_with_stdio(0) ; 
+        cin.tie(0) ;
+        //freopen("in.in" , "r" , stdin) ;
+
+        cin >> n >> s ; 
+        ll r = 0 ; 
+        for(int i = 0 ;i < n;i++){
+                ll a , b ;
+                cin >> a >> b; 
+                v.push_back({ a , b}); 
+                r+= a ;
+        }
+
+        sort(v.begin(),v.end(), cmp ) ;
+
+
+        ll l = 0 ;
+        ll ans = 0; 
+
+        while(l+1!=r){
+                ll mid = (l + r) >> 1;
+                if(check(mid)){
+                        ans = mid ; 
+                        r = mid ; 
+                }
+                else
+                        l = mid ;
+        }
+        cout<< r; 
+        return 0 ; 
+}

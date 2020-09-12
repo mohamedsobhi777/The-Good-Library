@@ -1,0 +1,127 @@
+/*
+        Problem Name : Dumplings 
+        Problem Link : https://szkopul.edu.pl/c/ioi-2020-training/p/dum/
+        Score : 100
+        Complexity : O(N sqrt(N))
+*/
+#include<bits/stdc++.h>
+
+#define I inline void 
+#define S struct 
+#define vi vector<int> 
+#define vii vector<pair<int,int>>
+
+using namespace std ; 
+using ll = long long ; 
+using ld = long double ; 
+
+const int N = 1e5 + 7 , mod = 1e9 + 7 ; 
+const int inf = N ; 
+const int rot = 280 ; 
+// How interesting!
+
+
+int n; 
+
+ll bit[N] ;
+int a[N] ; 
+
+
+ll sums[1001] , incs[1001] ;
+ll sums2[1001] , incs2[1001] ; 
+
+int inx(int x){
+	return (x - 1) / rot ; 
+}
+
+I add(int ix , int x){
+	for(;ix < N ;ix += ix &-ix)
+		bit[ix] += x ;
+}
+
+ll upto(int ix){
+	ll ret = 0 ; 
+	for(;ix;ix-=ix&-ix)
+		ret+= bit[ix] ;
+	return ret ; 
+}
+
+ll get(int l , int r){
+	return upto(r) - upto(l - 1) ; 
+}
+
+I update(int ix , int x){
+	int ad = x - a[ix] ;
+	add(ix , x - a[ix]) ; 
+	int pos = inx(ix) ; 
+
+	sums[pos] += ad ; 
+	incs[pos] += 1ll * ad * ( (ix - 1) % rot + 1 ) ; 
+
+
+	int p = ( (ix - 1) % rot + 1) ; 
+	sums2[pos] += 1ll * ad * p * p ; 
+
+	a[ix] = x ;
+}
+
+
+int main(){
+	ios_base::sync_with_stdio(0) ; 
+	cin.tie(0) ;
+        
+	cin >> n;  
+	for(int i = 1 ;i <= n;i++){
+		int x ; 
+		cin >> x ; 
+		update(i , x) ; 
+	}
+
+	int k ; 
+	cin >> k ; 
+	while (k -- ){
+		int x , y , z ; 
+		cin >> x >> y ; 
+		if(x < 0){
+			update(-x , y) ; 
+		}
+		else{
+			cin >> z ;
+			if(x == 0){
+				cout<<get(y , z) <<"\n" ;
+			}
+			else if( x == 1){
+				ll ans = 0 ;
+				for(int i = y ; i <= z ; ){
+					if( (i - 1) % rot == 0 &&  i + rot <= z){
+						ans += incs[inx(i)] + sums[inx(i)] * (i - y) ; 
+						i += rot; 
+					}	
+					else{
+						ans += 1ll * a[i] * (i - y +1) ;
+						i ++ ; 
+					}
+				}	
+				cout<< ans <<"\n"; 
+			}else{	
+				ll ans = 0 ;
+				for(int i = y ; i <= z ; ){
+					if( (i - 1) % rot == 0 &&  i + rot <= z){
+						ll nw = i - y + 1 ; 
+						ll cof = 1ll * (i - y) *(2ll * incs[inx(i)] + (i - y ) * sums[inx(i)] ) ; 
+						ans +=  cof  + sums2[inx(i)] ;
+						i += rot; 
+					}	
+					else{
+						ll cof = (i - y  + 1) ; 
+						ans += 1ll * a[i] * cof * cof ;
+						i ++ ; 
+					}
+				}	
+				cout<< ans <<"\n"; 
+			}
+		}
+	}
+
+	return 0 ; 
+}

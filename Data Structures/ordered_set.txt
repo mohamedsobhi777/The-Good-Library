@@ -1,0 +1,40 @@
+struct ordered_set
+{
+        int bit[N];
+        int sz = 0;
+        ordered_set()
+        {
+                memset(bit, 0, sizeof bit);
+        }
+        void insert(int x, int d = 1)
+        {
+                sz += d;
+                x++;
+                for (; x < N; x += x & -x)
+                        bit[x] += d;
+        }
+        void erase(int x)
+        {
+                insert(x, -1);
+        }
+        int size()
+        {
+                return sz;
+        }
+        int find_by_order(int x)
+        {
+                int pos = 0;
+                int val = 0;
+                for (int i = 20; ~i; --i)
+                {
+                        if (pos + (1 << i) >= N)
+                                continue;
+                        if (val + bit[pos + (1 << i)] < x)
+                        {
+                                val += bit[pos + (1 << i)];
+                                pos += (1 << i);
+                        }
+                }
+                return pos;
+        }
+};

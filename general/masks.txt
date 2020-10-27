@@ -1,0 +1,14 @@
+iterate over submasks
+        int n , mask ; 
+        for (int sub = mask; sub; sub = (sub - 1) & mask)
+        {
+                print(sub);
+        }
+
+
+iterate over supermasks
+        int n , mask ; 
+        for (int over = (1 << n) - 1; over > 0; over = ((over - mask - 1) & ~mask) + mask)
+        {
+             cout << over << " ";
+        }

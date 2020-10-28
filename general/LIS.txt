@@ -1,0 +1,31 @@
+non-decreasing
+int lis()
+{
+        vector<int> arr;
+        multiset<int> mult;
+        for (auto u : arr)
+        {
+                mult.insert(u);
+                auto it = mult.upper_bound(u);
+                if (it != mult.end())
+                        mult.erase(it);
+        }
+        return (int)mult.size();
+}
+
+strictly increasing
+
+int lis()
+{
+        vector<int> arr;
+        multiset<int> mult;
+        for (auto u : arr)
+        {
+                mult.insert(u);
+                auto it = mult.lower_bound(u);
+                ++ it ; 
+                if (it != mult.end())
+                        mult.erase(it);
+        }
+        return (int)mult.size();
+}

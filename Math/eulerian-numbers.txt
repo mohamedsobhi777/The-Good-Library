@@ -1,0 +1,16 @@
+// number of n-permutations where there is m nubmers greater than their previous elements
+
+int eulerian(int n, int m)
+{
+        int ret = 0;
+        int ncr = 1;
+        for (int i = 0; i <= m; ++i)
+        {
+                int add = 1ll * ncr * faspow(m + 1 - i, n) % mod;
+                ret = (ret + (i & 1 ? -add : add));
+                ret = (ret % mod + mod) % mod;
+                int mul = 1ll * (n + 1 - i) * faspow(i + 1, mod - 2) % mod;
+                ncr = 1ll * ncr * mul % mod;
+        }
+        return ret;
+}

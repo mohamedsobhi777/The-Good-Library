@@ -1,4 +1,5 @@
 // number of n-permutations where there is m nubmers greater than their previous elements
+//A(n,m) = sum[0,m+1] { (-1)^k * (n+1)C(k) * (m + 1 - k)^n }
 
 int eulerian(int n, int m)
 {

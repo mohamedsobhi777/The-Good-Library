@@ -1,0 +1,55 @@
+
+const int A = 70;
+int nxt[N][70], nod ; 
+int fail[N], tail[N];
+
+int id(char c)
+{
+        if (c >= 'a' && c <= 'z')
+                return c - 'a';
+        else if (c >= 'A' && c <= 'Z')
+                return c - 'A' + 26;
+        else if (c >= '0' && c <= '9')
+                return c - '0' + 52;
+        return 62;
+}
+
+int add(string c)
+{
+        int cur = 0, len = (int)c.size();
+        for (int i = 0; i < len; ++i)
+                cur = nxt[cur][id(c[i])] = (nxt[cur][id(c[i])] ? nxt[cur][id(c[i])] : ++nod);
+        return cur;
+}
+
+
+void pu4()
+{
+        queue<int> q;
+        for (int i = 0; i < A; ++i)
+        {
+                if (nxt[0][i])
+                {
+                        fail[nxt[0][i]] = 0;
+                        q.push(nxt[0][i]);
+                }
+        }
+
+        while (q.size())
+        {
+                int cur = q.front();
+                q.pop();
+                for (int i = 0; i < A; ++i)
+                {
+                        if (nxt[cur][i])
+                        {
+                                fail[nxt[cur][i]] = nxt[fail[cur]][i];
+                                q.push(nxt[cur][i]);
+                        }
+                        else
+                        {
+                                nxt[cur][i] = nxt[fail[cur]][i];
+                        }
+                }
+        }
+}

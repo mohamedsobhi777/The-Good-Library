@@ -1,0 +1,36 @@
+
+struct poly{
+	map<ll,ll> cor ; 
+	int sz = 0 ; 
+	poly(){
+		//cor = {{1 , 0}} ;
+		sz = 0; 
+	}
+	void add(pair<ll,ll> x){
+		cor[x.second]+=x.first ; 
+	}
+	void mul(poly &rhs){
+		vector<pair<ll,ll>> ret ; 
+		int s1 = sz , s2 =(int) rhs.sz ; 
+		map<ll,ll> mp ; 
+		for(auto u : cor){
+			for(auto v : rhs.cor){
+				ll C = 1ll * u.second % mod * v.second % mod ; 
+				ll ncof = (u.first + v.first ); 
+				mp[ncof] = (mp[ncof] + C) % mod ; 
+			}
+		}
+		cor = mp; 
+	}
+	void print(){
+		for(auto u : cor){
+			if(u.first == 0){
+				cout<<u.second<<" " ; continue ; 
+			}
+			else{
+				cout<<"+" <<u.second <<"X^" << u.first <<" " ; 
+			}
+		}
+		cout<< "\n" ; 
+	}
+} ; 

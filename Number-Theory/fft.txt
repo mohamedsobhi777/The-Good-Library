@@ -1,0 +1,52 @@
+
+const double pi = acos(-1.0);
+
+void fft(vector<cd> &a, bool inv)
+{
+        int z = sz(a);
+        for (int i = 1, j = 0; i < z; i++)
+        {
+                int bit = z >> 1;
+                for (; j & bit; bit >>= 1)
+                        j ^= bit;
+                j ^= bit;
+
+                if (i < j)
+                        swap(a[i], a[j]);
+        }
+
+        for (int len = 2; len <= z; len <<= 1)
+        {
+                double ang = 2 * pi / len * (inv ? -1.0 : 1.0);
+                cd wn(cos(ang), sin(ang));
+                for (int i = 0; i < z; i += len)
+                {
+                        cd w(1);
+                        for (int j = 0; j < len / 2; ++j)
+                        {
+                                cd u = a[i + j], v = a[i + j + len / 2] * w;
+                                a[i + j] = u + v, a[i + j + len / 2] = u - v;
+                                w *= wn;
+                        }
+                }
+        }
+        if (inv)
+                for (int i = 0; i < z; ++i)
+                        a[i] /= z;
+}
+vector<ll> multiply(vll &a, vll &b)
+{
+        vector<cd> A(all(a)), B(all(b));
+        int z = 1;
+        while (z < (sz(a) + sz(b)))
+                z <<= 1;
+        A.resize(z), B.resize(z);
+        fft(A, 0), fft(B, 0);
+        for (int i = 0; i < z; ++i)
+                A[i] *= B[i];
+        fft(A, 1);
+        vll ret(z);
+        for (int i = 0; i < z; ++i)
+                ret[i] = round(A[i].real());
+        return ret;
+}

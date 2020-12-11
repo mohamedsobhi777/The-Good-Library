@@ -1,0 +1,61 @@
+struct Matrix
+{
+        vector<vector<int>> mat;
+        void zeroes(int x, int y) { mat = vector<vector<int>>(x, vector<int>(y, 0)); }
+        void id(int x)
+        {
+                zeroes(x, x);
+                for (int i = 0; i < x; ++i)
+                        mat[i][i] = 1;
+        }
+        Matrix operator+(Matrix &rhs)
+        {
+                int x = min((int)mat.size(), (int)rhs.mat.size());
+                int y = min((int)mat[0].size(), (int)rhs.mat[0].size());
+                inc(i, 0, x - 1) inc(j, 0, y - 1) mat[i][j] += rhs.mat[i][j];
+                return *this;
+        }
+        vvi mul(vvi &lhs, vvi &rhs)
+        {
+                int x = (int)lhs.size(), y = (int)lhs[0].size(), z = (int)rhs[0].size();
+                vector<vector<int>> ret(x, vector<int>(z));
+                inc(i, 0, x - 1) inc(j, 0, z - 1) inc(k, 0, y - 1) ret[i][j] = (ret[i][j] + 1ll * lhs[i][k] * rhs[k][j] % (mod)) % (mod);
+                return ret;
+        }
+        Matrix operator*(Matrix &rhs)
+        {
+                mat = mul(mat, rhs.mat);
+                return *this;
+        }
+        void Mul(Matrix &rhs) { mat = mul(mat, rhs.mat); }
+        void faspow(ll p)
+        {
+                int y = (int)mat.size();
+                if (p == 0)
+                        return void(id(y));
+                vvi ex = mat;
+                id(y);
+                while (p)
+                {
+                        if (p & 1ll)
+                                mat = mul(mat, ex);
+                        ex = mul(ex, ex);
+                        p >>= 1ll;
+                }
+        }
+        void tomatrix(vvi x) { mat = x; }
+        Matrix() {}
+        Matrix(int x) { zeroes(x, x); }
+        Matrix(vvi x) { mat = x; }
+        void print()
+        {
+                int x = (int)mat.size();
+                int y = (int)mat[0].size();
+                inc(i, 0, x - 1)
+                {
+                        inc(j, 0, y - 1) cout << mat[i][j] << " ";
+                        cout << "\n";
+                }
+                cout << "--\n";
+        }
+};

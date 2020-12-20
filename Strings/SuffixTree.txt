@@ -4,6 +4,7 @@ struct SuffixTree
         string s;
         vector<map<int, int>> to;
         vector<int> len, fpos, link, st, en, vec, dep;
+        vector<ll> dp;
         int node = 0, pos = 0, dfs_time = 0;
         int sz = 1, z = 0;
         void resize(int aux)
@@ -16,6 +17,13 @@ struct SuffixTree
                 en.resize(4 * aux);
                 vec.resize(4 * aux);
                 dep.resize(2 * aux);
+                dp.resize(2 * aux);
+        }
+        int get_len(int node)
+        {
+                if (node)
+                        return len[node] > z ? z - fpos[node] : len[node];
+                return 0;
         }
         pair<int, int> follow(string &str)
         {
@@ -100,11 +108,13 @@ struct SuffixTree
                 st[cur] = ++dfs_time;
                 if (len[cur] > z)
                         vec[dfs_time] = cur;
+                dp[cur] = get_len(cur) - (len[cur] > z);
                 for (auto u : to[cur])
                 {
                         if (cur)
                                 dep[u.s] = dep[cur] + len[cur];
                         dfs(u.s);
+                        dp[cur] += dp[u.s];
                 }
                 en[cur] = ++dfs_time;
         }
@@ -113,19 +123,55 @@ struct SuffixTree
         {
                 pair<int, int> pos = follow(str);
                 int de = dep[pos.f] + pos.s - (int)str.size();
+                vector<int> ret;
                 if (pos.f)
                 {
-                        vector<int> ret;
                         for (int j = st[pos.f]; j <= en[pos.f]; ++j)
                         {
                                 if (vec[j])
-                                {
                                         ret.push_back(de + fpos[vec[j]] - dep[vec[j]] - 1);
+                        }
+                }
+                return ret;
+        }
+
+        string kth_substring(ll k)
+        {
+                string ret;
+                int cur = 0;
+                while (k)
+                {
+                        bool flag = 0;
+                        for (auto u : to[cur])
+                        {
+
+                                if (dp[u.s] < k - get_len(cur))
+                                        k -= dp[u.s];
+                                else
+                                {
+                                        if (cur)
+                                                ret += s.substr(fpos[cur], len[cur]);
+                                        k -= get_len(cur);
+
+                                        cur = u.s;
+                                        flag = 1;
+                                        break;
                                 }
                         }
-                        return ret;
+                        if (!flag)
+                        {
+                                ret += s.substr(fpos[cur], k);
+                                break;
+                        }
                 }
-                else
-                        return {};
+                return ret;
+        }
+
+        ll count_unique()
+        {
+                ll ret = 0;
+                for (int i = 0; i <= sz; ++i)
+                        ret += get_len(i);
+                return ret - z;
         }
 };

@@ -1,10 +1,59 @@
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+
+#pragma GCC optimize("-Ofast")
+//#pragma GCC optimize("trapv")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,sse4.2,popcnt,abm,mmx,avx2,tune=native")
+#pragma GCC optimize("-ffast-math")
+#pragma GCC optimize("-funroll-loops")
+
+#define fpos adla
+using namespace std;
+using namespace __gnu_pbds;
+
+#define vi vector<int>
+#define vll vector<ll>
+#define vii vector<pair<int, int>>
+#define vvi vector<vi>
+#define vvii vector<vii>
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+#define loop(_) for (int __ = 0; __ < (_); ++__)
+#define forn(i, n) for (int i = 0; i < n; ++i)
+#define pb push_back
+#define f first
+#define s second
+#define sz(_) ((int)_.size())
+#define all(_) _.begin(), _.end()
+#define uni(_) unique(_)
+#define lb lower_bound
+#define ub upper_bound
+#define si set<int>
+#define ms multiset<int>
+#define qi queue<int>
+#define pq prioriry_queue<int>
+#define mi map<int, int>
+#define inc(i, l, r) for (int i = l; i <= r; i++)
+#define dec(i, l, r) for (int i = l; i >= r; i--)
+
+using ll = long long;
+using ld = long double;
+
+const int N = 1e5 + 7;
+const ll mod = 1e9 + 7;
+const ll inf = 2e18;
+
+auto ra = [] {char *p = new char ; delete p ; return ll(p) ; };
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count() * (ra() | 1));
+typedef tree<pii, null_type, less<pii>, rb_tree_tag, tree_order_statistics_node_update> os;
+
 struct SuffixTree
 {
         const int oo = 1e9;
         string s;
         vector<map<int, int>> to;
-        vector<int> len, fpos, link;
-        int node = 0, pos = 0;
+        vector<int> len, fpos, link, st, en, vec, dep;
+        int node = 0, pos = 0, dfs_time = 0;
         int sz = 1, z = 0;
         void resize(int aux)
         {
@@ -12,6 +61,24 @@ struct SuffixTree
                 len.resize(2 * aux);
                 link.resize(2 * aux);
                 fpos.resize(2 * aux);
+                st.resize(4 * aux);
+                en.resize(4 * aux);
+                vec.resize(4 * aux);
+                dep.resize(2 * aux);
+        }
+        pair<int, int> follow(string &str)
+        {
+                int cur = 0;
+                int i = 0;
+                for (auto u : str)
+                {
+                        if (cur == 0 || i == len[cur])
+                                cur = to[cur][u], i = 0;
+
+                        if (!cur || u != s[fpos[cur] + i++])
+                                return {0, 0};
+                }
+                return {cur, i};
         }
         int make_node(int _pos, int _len)
         {
@@ -46,10 +113,7 @@ struct SuffixTree
                                 last = 0;
                         }
                         else if (t == c)
-                        {
-                                link[last] = node;
-                                return;
-                        }
+                                return void(link[last] = node);
                         else
                         {
                                 int u = make_node(fpos[v], pos - 1);
@@ -57,8 +121,7 @@ struct SuffixTree
                                 to[u][t] = v;
                                 fpos[v] += pos - 1;
                                 len[v] -= pos - 1;
-                                v = u;
-                                link[last] = u;
+                                v = link[last] = u;
                                 last = u;
                         }
                         if (node == 0)
@@ -79,17 +142,71 @@ struct SuffixTree
                 if (sz(str))
                         add_string(str);
         }
-        bool check(string x)
+        bool check(string x) { return !!follow(x).f; }
+
+        void dfs(int cur)
         {
-                int cur = 0;
-                int i = 0;
-                for (auto u : x)
+                st[cur] = ++dfs_time;
+                if (len[cur] > z)
+                        vec[dfs_time] = cur;
+                for (auto u : to[cur])
                 {
-                        if (cur == 0 || i == len[cur])
-                                cur = to[cur][u], i = 0;
-                        if (!cur || u != s[fpos[cur] + i++])
-                                return 0;
+                        if (cur)
+                                dep[u.s] = dep[cur] + len[cur];
+                        dfs(u.s);
                 }
-                return 1;
+                en[cur] = ++dfs_time;
+        }
+
+        vector<int> get_occs(string str)
+        {
+                pair<int, int> pos = follow(str);
+                int de = dep[pos.f] + pos.s - (int)str.size();
+                if (pos.f)
+                {
+                        vector<int> ret;
+                        for (int j = st[pos.f]; j <= en[pos.f]; ++j)
+                        {
+                                if (vec[j])
+                                {
+                                        ret.push_back(de + fpos[vec[j]] - dep[vec[j]] - 1);
+                                }
+                        }
+                        return ret;
+                }
+                else
+                        return {};
         }
 };
+
+int main()
+{
+        ios_base::sync_with_stdio(0);
+        cin.tie(0);
+        //freopen("in.in", "r", stdin);
+
+        int n;
+        while (cin >> n)
+        {
+                string _;
+                getline(cin, _);
+                vector<string> pats(n);
+                for (auto &u : pats)
+                        getline(cin, u);
+                string mat;
+                getline(cin, mat);
+                SuffixTree suf = SuffixTree(mat);
+                suf.add_letter(500);
+                suf.dfs(0);
+                for (auto u : pats)
+                {
+                        vi occs = suf.get_occs(u);
+                        sort(all(occs));
+                        for (auto u : occs)
+                                cout << ++u << " ";
+                        cout << "\n";
+                }
+        }
+
+        return 0;
+}

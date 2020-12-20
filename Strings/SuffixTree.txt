@@ -1,0 +1,95 @@
+struct SuffixTree
+{
+        const int oo = 1e9;
+        string s;
+        vector<map<int, int>> to;
+        vector<int> len, fpos, link;
+        int node = 0, pos = 0;
+        int sz = 1, z = 0;
+        void resize(int aux)
+        {
+                to.resize(2 * aux);
+                len.resize(2 * aux);
+                link.resize(2 * aux);
+                fpos.resize(2 * aux);
+        }
+        int make_node(int _pos, int _len)
+        {
+                fpos[sz] = _pos;
+                len[sz] = _len;
+                return sz++;
+        }
+        void go_edge()
+        {
+                while (pos > len[to[node][s[z - pos]]])
+                {
+                        node = to[node][s[z - pos]];
+                        pos -= len[node];
+                }
+        }
+        void add_letter(int c)
+        {
+                s += char(c), ++z;
+                resize(z);
+                pos++;
+                int last = 0;
+                while (pos > 0)
+                {
+                        go_edge();
+                        int edge = s[z - pos];
+                        int &v = to[node][edge];
+                        int t = s[fpos[v] + pos - 1];
+                        if (v == 0)
+                        {
+                                v = make_node(z - pos, oo);
+                                link[last] = node;
+                                last = 0;
+                        }
+                        else if (t == c)
+                        {
+                                link[last] = node;
+                                return;
+                        }
+                        else
+                        {
+                                int u = make_node(fpos[v], pos - 1);
+                                to[u][c] = make_node(z - 1, oo);
+                                to[u][t] = v;
+                                fpos[v] += pos - 1;
+                                len[v] -= pos - 1;
+                                v = u;
+                                link[last] = u;
+                                last = u;
+                        }
+                        if (node == 0)
+                                pos--;
+                        else
+                                node = link[node];
+                }
+        }
+        void add_string(string str)
+        {
+                for (auto u : str)
+                        add_letter(u);
+        }
+        SuffixTree(string str)
+        {
+                resize(1);
+                len[0] = oo;
+                if (sz(str))
+                        add_string(str);
+        }
+        bool check(string x)
+        {
+                int cur = 0;
+                int i = 0;
+                for (auto u : x)
+                {
+                        if (cur == 0 || i == len[cur])
+                                cur = to[cur][u], i = 0;
+                        if (!cur || u != s[fpos[cur] + i++])
+                                return 0;
+                }
+                return 1;
+        }
+};

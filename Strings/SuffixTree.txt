@@ -147,7 +147,7 @@ struct SuffixTree
 
                                 if (dp[u.s] < k - get_len(cur))
                                         k -= dp[u.s];
-                                else
+                                else if (k >= get_len(cur))
                                 {
                                         if (cur)
                                                 ret += s.substr(fpos[cur], len[cur]);

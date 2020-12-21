@@ -1,0 +1,15 @@
+        vector<int> z_to_kmp(vector<int> zarr)
+        {
+                int z = (int)zarr.size();
+                vector<int> ret(z);
+                queue<pair<int, int>> q;
+                for (int i = 0; i < z; ++i)
+                {
+                        q.push({i, i + zarr[i] - 1});
+                        while (q.size() && q.front().second < i)
+                                q.pop();
+                        if (q.size())
+                                ret[i] = i - q.front().first + 1;
+                }
+                return ret;
+        }

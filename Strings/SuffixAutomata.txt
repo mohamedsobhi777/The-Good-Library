@@ -1,23 +1,34 @@
+
 struct SuffixAutomata
 {
-        struct state{int size = 0, link = -1;bool term = 0;map<int, int> to;};
+        struct state
+        {
+                int size = 0, link = -1;
+                bool term = 0;
+                map<int, int> to;
+        };
         vector<state> st;
+        vector<long long> dp_unique;
         int size = 0, last = 0;
         void extend(int x)
         {
                 int cur = size++, p = last;
                 st[cur].size = st[last].size + 1;
-                while (p != -1 && !st[p].to.count(x))st[p].to[x] = cur, p = st[p].link;
-                if (p == -1)st[cur].link = 0;
+                while (p != -1 && !st[p].to.count(x))
+                        st[p].to[x] = cur, p = st[p].link;
+                if (p == -1)
+                        st[cur].link = 0;
                 else
                 {
                         int q = st[p].to[x];
-                        if (st[p].size + 1 == st[q].size)st[cur].link = q;
+                        if (st[p].size + 1 == st[q].size)
+                                st[cur].link = q;
                         else
                         {
                                 int clone = size++;
                                 st[clone] = st[q], st[clone].size = st[p].size + 1;
-                                while (p != -1 && st[p].to[x] == q)st[p].to[x] = clone, p = st[p].link;
+                                while (p != -1 && st[p].to[x] == q)
+                                        st[p].to[x] = clone, p = st[p].link;
                                 st[cur].link = st[q].link = clone;
                         }
                 }
@@ -25,8 +36,23 @@ struct SuffixAutomata
         }
         SuffixAutomata(string &s)
         {
-                st = vector<state>((int) s.size() * 2, state()), ++size;
-                for (auto u : s)extend(u);
-                for (int i = last; ~i; i = st[i].link)st[i].term = 1;
+                st = vector<state>((int)s.size() * 2, state()), ++size;
+                for (auto u : s)
+                        extend(u);
+                for (int i = last; ~i; i = st[i].link)
+                        st[i].term = 1;
+        }
+        void build_aux()
+        {
+                dp_unique = vector<long long>(size * 2 + 1, -1);
+        }
+        long long count_unique(int x = 0)
+        {
+                long long ret = (x > 0);
+                if (~dp_unique[x])
+                        return dp_unique[x];
+                for (auto u : st[x].to)
+                        ret += count_unique(u.second);
+                return dp_unique[x] = ret;
         }
 };

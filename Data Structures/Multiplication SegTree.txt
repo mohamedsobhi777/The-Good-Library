@@ -1,0 +1,37 @@
+struct IntervalTree
+{
+       int tre[4 * N];
+       int lazy[N * 4];
+
+       IntervalTree()
+       {
+              fill(tre, tre + N * 4, 1);
+              fill(lazy, lazy + N * 4, 1);
+       }
+
+       void update(int node, int L, int R, int l, int r, int x)
+       {
+              if (l > R || r < L)
+                     return;
+              if (L >= l && R <= r)
+                     return void(lazy[node] = 1ll * lazy[node] * x % mod);
+              int mid = (L + R) >> 1;
+              update(node * 2 + 1, L, mid, l, r, x);
+              update(node * 2 + 2, mid + 1, R, l, r, x);
+              int v1 = 1ll * tre[node * 2 + 1] * faspow(lazy[node * 2 + 1], mid - L + 1) % mod;
+              int v2 = 1ll * tre[node * 2 + 2] * faspow(lazy[node * 2 + 2], R - mid) % mod;
+              tre[node] = 1ll * v1 * v2 % mod;
+       }
+
+       int query(int node, int L, int R, int l, int r)
+       {
+              if (l > R || r < L)
+                     return 1;
+              if (L >= l && R <= r)
+                     return 1ll * tre[node] * faspow(lazy[node], R - L + 1) % mod;
+              int mid = (L + R) >> 1;
+              int ret = 1ll * query(node * 2 + 1, L, mid, l, r) * query(node * 2 + 2, mid + 1, R, l, r) % mod;
+              ret = 1ll * ret * faspow(lazy[node], min(r, R) - max(l, L) + 1) % mod;
+              return ret;
+       }
+} mulTree;

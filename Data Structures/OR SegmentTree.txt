@@ -1,0 +1,34 @@
+
+struct segtree
+{
+       ll tre[N * 4], lazy[4 * N];
+       segtree()
+       {
+              memset(tre, 0ll, sizeof tre);
+              memset(lazy, 0ll, sizeof lazy);
+       }
+       void update(int node, int L, int R, int l, int r, ll mask)
+       {
+              if (l > R || r < L)
+                     return;
+              if (L >= l && R <= r)
+                     return void(lazy[node] |= mask);
+              int mid = (L + R) >> 1;
+              update(node * 2 + 1, L, mid, l, r, mask);
+              update(node * 2 + 2, mid + 1, R, l, r, mask);
+              tre[node] = tre[node * 2 + 1] | tre[node * 2 + 2] | lazy[node * 2 + 1] | lazy[node * 2 + 2];
+       }
+
+       ll query(int node, int L, int R, int l, int r)
+       {
+              if (l > R || r < L)
+                     return 0;
+              if (L >= l && R <= r)
+                     return tre[node] | lazy[node];
+              int mid = (L + R) >> 1;
+              ll s1 = query(node * 2 + 1, L, mid, l, r);
+              ll s2 = query(node * 2 + 2, mid + 1, R, l, r);
+              return s1 | s2 | lazy[node];
+       }
+
+} orTree;

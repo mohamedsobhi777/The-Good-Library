@@ -1,0 +1,36 @@
+int count_primes(int x)
+{
+       const int block = 1000;
+       vector<bool> isp(block + 1, 1);
+       vector<int> prms;
+       int ret = 0;
+
+       for (int i = 2; i <= block; ++i)
+       {
+              if (isp[i])
+              {
+                     prms.push_back(i);
+                     for (int j = i * i; j <= block; j += i)
+                            isp[j] = 0;
+              }
+       }
+
+       for (int sb = 0; sb * block <= x; ++sb)
+       {
+              fill(isp.begin(), isp.end(), 1);
+              vector<int> isp(block + 1, 1);
+              int st = sb * block;
+              for (auto u : prms)
+              {
+                     int six = max(u, (st + u - 1) / u) * u;
+                     for (int j = six - st; j < block; j += u)
+                            isp[j] = 0;
+              }
+
+              if (sb == 0)
+                     isp[0] = isp[1] = 0;
+              for (int i = 0; i < block && i + st <= x; ++i)
+                     ret += isp[i];
+       }
+       return ret;
+}

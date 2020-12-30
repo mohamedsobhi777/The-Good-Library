@@ -1,0 +1,199 @@
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+
+#pragma GCC optimize("-Ofast")
+//#pragma GCC optimize("trapv")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,sse4.2,popcnt,abm,mmx,avx2,tune=native")
+#pragma GCC optimize("-ffast-math")
+#pragma GCC optimize("-funroll-loops")
+
+using namespace std;
+using namespace __gnu_pbds;
+
+#define vi vector<int>
+#define vll vector<ll>
+#define vii vector<pair<int, int>>
+#define vvi vector<vi>
+#define vvii vector<vii>
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+#define loop(_) for (int __ = 0; __ < (_); ++__)
+#define forn(i, n) for (int i = 0; i < n; ++i)
+#define pb push_back
+#define f first
+#define s second
+#define sz(_) ((int)_.size())
+#define all(_) _.begin(), _.end()
+#define uni(_) unique(_)
+#define lb lower_bound
+#define ub upper_bound
+#define si set<int>
+#define ms multiset<int>
+#define qi queue<int>
+#define pq prioriry_queue<int>
+#define mi map<int, int>
+#define inc(i, l, r) for (int i = l; i <= r; i++)
+#define dec(i, l, r) for (int i = l; i >= r; i--)
+
+using lll = __int128;
+using ll = unsigned long long;
+using ld = long double;
+
+const ll mod = 1e9 + 7;
+const ll inf = 2e18;
+
+auto ra = [] {char *p = new char ; delete p ; return ll(p) ; };
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count() * (ra() | 1));
+typedef tree<pii, null_type, less<pii>, rb_tree_tag, tree_order_statistics_node_update> os;
+
+__int128 read()
+{
+       __int128 x = 0, f = 1;
+       char ch = getchar();
+       while (ch < '0' || ch > '9')
+       {
+              if (ch == '-')
+                     f = -1;
+              ch = getchar();
+       }
+       while (ch >= '0' && ch <= '9')
+       {
+              x = x * 10 + ch - '0';
+              ch = getchar();
+       }
+       return x * f;
+}
+void print(__int128 x)
+{
+       if (x < 0)
+       {
+              putchar('-');
+              x = -x;
+       }
+       if (x > 9)
+              print(x / 10);
+       putchar(x % 10 + '0');
+}
+
+bool cmp(__int128 x, __int128 y) { return x > y; }
+
+const int N = 5e6;
+
+const int PM = 2 * 3 * 5 * 7 * 11 * 13 * 17;
+const int M = 7;
+struct PRIME
+{
+
+       int phi[N + 1][M + 1], sz[M + 1], prime[N], pi[N];
+       bool np[N];
+       PRIME()
+       {
+       }
+       int getprime()
+       {
+              int cnt = 0;
+              np[0] = np[1] = true;
+              pi[0] = pi[1] = 0;
+              for (int i = 2; i < N; ++i)
+              {
+                     if (!np[i])
+                            prime[++cnt] = i;
+                     else
+                            continue;
+                     for (int j = i + i; j < N; j += i)
+                            np[j] = 1;
+              }
+              int j = 1;
+              for (int i = 2; i < N; ++i)
+              {
+                     pi[i] = pi[i - 1];
+                     if (prime[j] == i)
+                            ++pi[i], ++j;
+              }
+              return cnt;
+       }
+
+       void init()
+       {
+              getprime();
+              sz[0] = 1;
+              for (int i = 0; i <= PM; ++i)
+                     phi[i][0] = i;
+              for (int i = 1; i <= M; ++i)
+              {
+                     sz[i] = prime[i] * sz[i - 1];
+                     for (int j = 1; j <= PM; ++j)
+                            phi[j][i] = phi[j][i - 1] - phi[j / prime[i]][i - 1];
+              }
+       }
+
+       ll sqrt2(ll x)
+       {
+              ll ret = sqrt(x - 1.0);
+              while (1ll * ret * ret <= x)
+                     ++ret;
+              return --ret;
+       }
+
+       ll sqrt3(ll x)
+       {
+              ll ret = cbrt(x - 1.0);
+              while (1ll * ret * ret * ret <= x)
+                     ++ret;
+              return --ret;
+       }
+
+       ll getphi(ll x, int c)
+       {
+              if (c == 0)
+                     return x;
+              if (c <= M)
+                     return phi[x % sz[c]][c] + (x / sz[c]) * phi[sz[c]][c];
+              if (x <= prime[c] * prime[c])
+                     return pi[x] - c + 1;
+              if (x <= prime[c] * prime[c] * prime[c] && x < N)
+              {
+                     int s2x = pi[sqrt2(x)];
+                     ll ans = pi[x] - (s2x + c - 2) * (s2x - c + 1) / 2;
+                     for (int i = c + 1; i <= s2x; ++i)
+                            ans += pi[x / prime[i]];
+                     return ans;
+              }
+              return getphi(x, c - 1) - getphi(x / prime[c], c - 1);
+       }
+       ll pie(ll x)
+       {
+              if (x < N)
+                     return pi[x];
+              int b = (int)pie(sqrt2(x));
+              int c = (int)pie(sqrt3(x));
+              ll sum = getphi(x, c) + (ll)(b + c - 2) * (b - c + 1) / 2;
+              for (int i = c + 1; i <= b; i++)
+              {
+                     ll w = x / prime[i];
+                     sum -= pie(w);
+              }
+              return sum;
+       }
+} p;
+
+int n;
+
+int main()
+{
+       ios_base::sync_with_stdio(0);
+       cin.tie(0);
+#ifndef ONLINE_JUDGE
+       freopen("in.in", "r", stdin);
+#endif
+       p.init();
+       ll x;
+       cin >> x;
+       ll ans = 0;
+       for (ll i = 1; 1ll * p.prime[i] * p.prime[i] * p.prime[i] <= x; ++i)
+              ++ans;
+       for (int i = 1; 1ll * p.prime[i] * p.prime[i] <= x; ++i)
+              ans += p.pie(x / p.prime[i]) - i;
+       cout << ans;
+       return 0;
+}

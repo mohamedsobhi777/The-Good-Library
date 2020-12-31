@@ -1,0 +1,44 @@
+
+struct seg
+{
+       int x1, y1, x2, y2;
+       seg() {}
+};
+
+struct line
+{
+       ll A, B, C;
+       line() {}
+       line(seg a)
+       {
+              A = a.y1 - a.y2;
+              B = a.x2 - a.x1;
+              C = -A * a.x1 - B * a.y1;
+       };
+};
+
+       auto on = [&](int x, int l, int r) -> bool {
+              if (l > r)
+                     swap(l, r);
+              return x >= l && x <= r;
+       };
+
+       auto det = [](ll a, ll b, ll c, ll d) -> ll { return a * d - b * c; };
+
+       auto inter = [&](seg a, seg b, int &x, int &y) -> bool {
+              line l1(a), l2(b);
+              ll dx = det(l1.C, l1.B, l2.C, l2.B);
+              ll dy = det(l1.A, l1.C, l2.A, l2.C);
+              ll d = det(l1.A, l1.B, l2.A, l2.B);
+              if (d == 0)
+                     return 0;
+              if (dx % d || dy % d)
+                     return 0;
+              x = -dx / d;
+              y = -dy / d;
+              if (!on(x, a.x1, a.x2) || !on(x, b.x1, b.x2))
+                     return 0;
+              if (!on(y, a.y1, a.y2) || !on(y, b.y1, b.y2))
+                     return 0;
+              return 1;
+       };

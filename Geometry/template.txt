@@ -1,0 +1,39 @@
+const double eps = 1e-9;
+struct pnt
+{
+       double x, y;
+       pnt(double x, double y) : x(x), y(y) {}
+       double dist(pnt &ohs) { return hypot(x - ohs.x, y - ohs.y); }
+};
+
+struct Vector
+{
+       double x, y;
+       Vector(double x, double y) : x(x), y(y) {}
+       Vector(pnt _x, pnt _y) : x(_y.x - _x.x), y(_y.y - _x.y) {}
+       int quadrant() { return x >= 0 && y >= 0 ? 1 : (x < 0 && y >= 0 ? 2 : 3 + (x >= 0)); }
+       double len() { return hypot(x, y); }
+       double dot(const Vector &T) const { return x * T.x + y * T.y; }
+       double cross(const Vector &T) const { return x * T.y - y * T.x; }
+       Vector operator+(const Vector &T) const { return Vector(x + T.x, y + T.y); }
+       Vector operator-(const Vector &T) const { return Vector(x - T.x, y - T.y); }
+       Vector operator*(const double &T) const { return Vector(x * T, y * T); }
+       Vector rotate(const double &rad) const { return Vector(x * cos(rad) - y * sin(rad), x * sin(rad) + y * cos(rad)); }
+       bool operator<(Vector T) { return quadrant() == T.quadrant() ? cross(T) > 0 : quadrant() < T.quadrant(); }
+       bool operator==(const Vector &T) const { return fabs(x - T.x) < eps && fabs(y - T.y) < eps; }
+};
+
+struct polygon
+{
+       vector<pnt> p;
+       polygon() {}
+       polygon(vector<pnt> p) : p(p) {}
+       double area() const
+       {
+              double ret = 0;
+              for (int i = 1; i + 1 < sz(p); ++i)
+                     ret += Vector(p[0], p[i]).cross(Vector(p[0], p[i + 1]));
+              return ret / 2.0;
+       }
+};
+inline bool is_cw(pnt a, pnt b, pnt c) { return Vector(a, b).cross(Vector(b, c)) < 0; }

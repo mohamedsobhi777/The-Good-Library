@@ -1,0 +1,24 @@
+#define cd complex<double>
+#define ci complex<int>
+#define cll complex<long long>
+#define ld long double 
+#define ll long long
+
+const double pi = acos(-1.0), eps = 1e-9;
+
+template <class T>
+istream &operator>>(istream &is, complex<T> &p)
+{
+       T val;
+       is >> val, p.real(val);
+       is >> val, p.imag(val);
+       return is;
+}
+template <class T>
+ostream &operator<<(ostream &os, complex<T> p) { return os << "(" << real(p) << "," << imag(p) << ")\n"; }
+
+template <class T>
+double dot(T x, T y) { return real(conj(x) * y); }
+
+template <class T>
+double cross(T x, T y) { return imag(conj(x) * y); }

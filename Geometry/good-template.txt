@@ -1,3 +1,4 @@
+
 // the good template
 #define cd complex<double>
 #define cld complex<ld>
@@ -81,5 +82,13 @@ double arcDist(double r, T p1, T p2)
        double d = abs(p1 - p2);
        double theta = acos((2.0 * r * r - d * d) / (2.0 * r * r));
        return r * theta;
+}
+
+inline double AAS(double a1, double a2, double side) { return side * side / 2.0 / (1.0 / tan(a1) + 1.0 / tan(a2)); }
+inline double SSA(double s1, double s2, double a1) { return 0.5 * s1 * s2 * sin(a1); }
+inline double SSS(double s1, double s2, double s3)
+{
+       double ss = (s1 + s2 + s3) / 2.0;
+       return sqrt(ss * (ss - s1) * (ss - s2) * (ss - s3));
 }
 // >> the end of the good template

@@ -1,7 +1,9 @@
+// the good template
 #define cd complex<double>
+#define cld complex<ld>
 #define ci complex<int>
 #define cll complex<long long>
-#define ld long double 
+#define ld long double
 #define ll long long
 
 const double pi = acos(-1.0), eps = 1e-9;
@@ -22,3 +24,62 @@ double dot(T x, T y) { return real(conj(x) * y); }
 
 template <class T>
 double cross(T x, T y) { return imag(conj(x) * y); }
+
+template <class T>
+T trans(T x, T y) { return x + y; }
+
+template <class T>
+T scale(T x, T y, double rat) { return x + (y - x) * rat; }
+
+template <class T>
+T rot(T x, double ang) { return x * polar(1.0, ang); }
+
+template <class T>
+T perp(T x) { return T(-imag(x), real(x)); }
+
+template <class T>
+double ang(T x, T y) { return acos(clamp(dot(x, y) / abs(x) / abs(y), -1.0, 1.0)); }
+
+template <class T>
+bool half(T x) { return imag(x) > 0 || (imag(x) == 0 && real(x) < 0); }
+
+template <class T>
+vector<T> circirIntersection(T x, double r1, T y, double r2)
+{
+       vector<T> ret;
+       double d = abs(y - x);
+       double xo1 = (r1 * r1 + d * d - r2 * r2) / (2 * r1 * d);
+       double theta = acos(xo1);
+       if (r1 + r2 >= d)
+       {
+              T vec = (y - x) / d * r1;
+              ret = {x + rot(vec, theta), x + rot(vec, -theta)};
+       }
+       if (ret[0] == ret[1])
+              ret.pop_back();
+       return ret;
+}
+
+template <class T>
+vector<T> pointCircleTangent(T c, double r, T p)
+{
+       vector<T> ret;
+       double dist = norm(p - c);
+       if (dist > r * r)
+       {
+              T ur = (p - c) * r / sqrt(dist);
+              double theta = acos(r / sqrt(dist));
+              ret.pb(c + rot(ur, theta));
+              ret.pb(c + rot(ur, -theta));
+       }
+       return ret;
+}
+
+template <class T>
+double arcDist(double r, T p1, T p2)
+{
+       double d = abs(p1 - p2);
+       double theta = acos((2.0 * r * r - d * d) / (2.0 * r * r));
+       return r * theta;
+}
+// >> the end of the good template

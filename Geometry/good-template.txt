@@ -178,9 +178,10 @@ vector<T> ConvexHull(vector<T> poly)
        sort(all(poly), [&](T x, T y) { return real(x) < real(y) || (real(x) == real(y) && imag(x) < imag(y)); });
        for (int i = 0; i < 2; ++i)
        {
+              const int S = sz(ret);
               for (auto u : poly)
               {
-                     while (sz(ret) > 1 && cross(ret.end()[-1] - ret.end()[-2], u - ret.end()[-1]) > 0)
+                     while (sz(ret) >= S + 2 && cross(ret.end()[-1] - ret.end()[-2], u - ret.end()[-1]) >= 0)
                             ret.pop_back();
                      ret.pb(u);
               }

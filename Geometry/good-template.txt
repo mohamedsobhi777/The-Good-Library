@@ -144,4 +144,50 @@ pair<T, bool> SegmentIntersection(T a, T b, T c, T d, bool construct = 0)
               ret = lineintersection(a, b, c, d);
        return ret;
 }
+
+inline ll jcross(cll x, cll y) { return 1ll * real(x) * imag(y) - 1ll * real(y) * imag(x); }
+
+template <class T>
+ll polygonArea(vector<T> &vec)
+{
+       ll ret = 0;
+       for (int i = 1; i + 1 < sz(vec); ++i)
+              ret += jcross(vec[i + 1] - vec[0], vec[i] - vec[0]);
+       return abs(ret);
+}
+template <class T>
+int PointInPolygon(vector<T> &vec, T z)
+{
+       T rs = T(real(z) + 1, 1e9 + 1);
+       int cnt = 0;
+       for (int i = 0; i < n; ++i)
+       {
+              T p1 = vec[i], p2 = vec[(i + 1) % sz(vec)];
+              if (belong(p1, p2, z))
+                     return 0;
+              if (SegmentIntersection(z, rs, vec[i], vec[(i + 1) % sz(vec)]).s)
+                     ++cnt;
+       }
+       return cnt & 1 ? 1 : -1;
+}
+
+template <class T>
+vector<T> ConvexHull(vector<T> poly)
+{
+       vector<T> ret;
+       sort(all(poly), [&](T x, T y) { return real(x) < real(y) || (real(x) == real(y) && imag(x) < imag(y)); });
+       for (int i = 0; i < 2; ++i)
+       {
+              for (auto u : poly)
+              {
+                     while (sz(ret) > 1 && cross(ret.end()[-1] - ret.end()[-2], u - ret.end()[-1]) > 0)
+                            ret.pop_back();
+                     ret.pb(u);
+              }
+              ret.pop_back();
+              reverse(all(poly));
+       }
+       return ret;
+}
+
 // >> the end of the good template

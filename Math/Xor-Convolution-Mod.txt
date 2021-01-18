@@ -1,0 +1,47 @@
+
+const int mod = 1e9+7;
+inline ll add(int x, int y) { return (x + y >= mod ? x + y - mod : x + y); }
+ll faspow(ll x, ll y)
+{
+       ll ret = 1ll;
+       while (y)
+       {
+              if (y & 1)
+                     ret = 1ll * ret * x % mod;
+              x = 1ll * x * x % mod;
+              y >>= 1ll;
+       }
+       return ret;
+}
+void Transform(int *x, int n, bool inverse)
+{
+       for (int len = 1; 2 * len <= n; len <<= 1)
+       {
+              for (int i = 0; i < n; i += 2 * len)
+              {
+                     for (int j = 0; j < len; j++)
+                     {
+                            int u = x[i + j], v = x[i + len + j];
+                            x[i + j] = add(u, v);
+                            x[i + len + j] = add(u, mod - v);
+                     }
+              }
+       }
+       if (inverse)
+       {
+              int rev_n = faspow(n, mod - 2);
+              for (int i = 0; i < n; i++)
+              {
+                     x[i] = 1LL * x[i] * rev_n % mod;
+              }
+       }
+}
+
+void convolution(int *a, int *b, int *c)
+{
+       Transform(a, (1 << 17), false);
+       Transform(b, (1 << 17), false);
+       for (int i = 0; i < (1 << 17); i++)
+              c[i] = 1LL * a[i] * a[i] % mod;
+       Transform(c, (1 << 17), true);
+}

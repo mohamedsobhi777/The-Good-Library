@@ -1,0 +1,34 @@
+int calc(int n, int k, vector<int> pt)
+{
+       int z = sz(pt);
+       int ret = 0;
+       int now = 1;
+       for (int i = 1; i < z; ++i)
+       {
+              now = mul(now, nor(n - i));
+              now = mul(now, inv(nor(0 - i)));
+       }
+
+       for (int i = 0; i < z; ++i)
+       {
+              ret = add(ret, mul(pt[i], now));
+              if (i + 1 != z)
+              {
+                     now = mul(now, dv(n - i, n - (i + 1)));
+                     now = mul(now, dv(i + 1 - z, i + 1));
+              }
+       }
+       return ret;
+}
+
+int interpolate(int n, int k)
+{
+       vector<int> v;
+       for (int i = 0; i <= k + 1; ++i)
+       {
+              v.pb(brute(n , k));
+       }
+       if (n < sz(v))
+              return v[n];
+       return calc(n, k, v);
+}

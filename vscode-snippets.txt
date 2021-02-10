@@ -57,5 +57,13 @@
                      "}",
               ],
               "description": "binary indexed tree (aka fenwick tree)"
+       },
+       "ModOperations": {
+              "prefix": "modo",
+              "body": [
+                     "ll add(ll x, ll y) { return (x + y) % mod; }",
+                     "ll mul(ll x, ll y) { return 1ll * x * y % mod; }",
+              ],
+              "description": "some useful mod operations"
        }
 }

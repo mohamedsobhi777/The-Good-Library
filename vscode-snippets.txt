@@ -65,5 +65,29 @@
                      "ll mul(ll x, ll y) { return 1ll * x * y % mod; }",
               ],
               "description": "some useful mod operations"
+       },
+       "Union-Find": {
+              "prefix": "dsu",
+              "body": [
+                     "struct dsu,",
+                     "{",
+                     "      int fat[N];",
+                     "      dsu()",
+                     "      {",
+                     "             iota(fat, fat + N, 0);",
+                     "      }",
+                     "      int find(int x) { return fat[x] = (x == fat[x] ? x : find(fat[x])); }",
+                     "      void link(int u, int v)",
+                     "      {",
+                     "             u = find(u), v = find(v);",
+                     "             fat[u] = v;",
+                     "      }",
+                     "      bool same(int u, int v)",
+                     "      {",
+                     "             return find(u) == find(v);",
+                     "      }",
+                     "};      ",
+              ],
+              "description": "union find data structure"
        }
 }

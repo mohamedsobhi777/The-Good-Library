@@ -1,0 +1,100 @@
+
+struct node
+{
+       int key, pri, sz;
+       ll sum;
+       node *le, *ri;
+};
+typedef node *pnode;
+inline int get_sz(pnode t) { return t ? t->sz : 0; }
+
+void upd_sz(pnode t)
+{
+       if (t)
+              t->sz = get_sz(t->le) + get_sz(t->ri) + 1;
+}
+
+inline ll get_sum(pnode t) { return t ? t->sum : 0; }
+
+void upd_sum(pnode &t)
+{
+       if (t)
+              t->sum = get_sum(t->le) + get_sum(t->ri) + t->key;
+}
+
+void operation(pnode &t)
+{
+       if (!t)
+              return;
+       upd_sum(t);
+       upd_sz(t);
+}
+
+void split(pnode t, pnode &lhs, pnode &rhs, int key)
+{
+       if (!t)
+              lhs = rhs = NULL;
+       else if (t->key <= key)
+              split(t->ri, t->ri, rhs, key), lhs = t;
+       else
+              split(t->le, lhs, t->le, key), rhs = t;
+       operation(t);
+}
+
+void merge(pnode &t, pnode lhs, pnode rhs)
+{
+       if (!lhs || !rhs)
+              return void(t = lhs ? lhs : rhs);
+       else if (lhs->pri > rhs->pri)
+              merge(lhs->ri, lhs->ri, rhs), t = lhs;
+       else
+              merge(rhs->le, lhs, rhs->le), t = rhs;
+       operation(t);
+}
+
+void insert(pnode &t, pnode it)
+{
+       if (!t)
+              t = it;
+       else if (it->pri > t->pri)
+              split(t, it->le, it->ri, it->key), t = it;
+       else
+              insert(t->key <= it->key ? t->ri : t->le, it);
+       operation(t);
+}
+
+void erase(pnode &t, int key)
+{
+       if (!t)
+              return;
+       else if (t->key == key)
+       {
+              pnode temp = t;
+              merge(t, t->le, t->ri);
+              free(temp);
+       }
+       else
+              erase(key > t->key ? t->ri : t->le, key);
+       operation(t);
+}
+
+pnode init(int v)
+{
+       pnode ret = (pnode)malloc(sizeof(node));
+       ret->key = v;
+       ret->pri = rand();
+
+       ret->le = ret->ri = NULL;
+       ret->sum = v;
+       return ret;
+}
+
+void print(pnode t)
+{
+       if (t)
+       {
+              print(t->le);
+              cout << t->key << " ";
+              print(t->ri);
+       }
+}

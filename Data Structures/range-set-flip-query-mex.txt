@@ -1,0 +1,122 @@
+const int N = (1e5 + 7) * 22 * 2;
+const ll L = (1LL << 22);
+const ll mod = 1e9 + 7;
+
+int n, cnt = 1;
+int tree[N][2], lz[N], flp[N];
+ll sum[N];
+
+void prep()
+{
+       memset(lz, -1, sizeof lz);
+}
+
+int gnode(int x, int y)
+{
+       if (tree[x][y])
+              return tree[x][y];
+       return tree[x][y] = ++cnt;
+}
+
+void push(int node, ll L, ll R)
+{
+       if (~lz[node])
+       {
+              sum[node] = lz[node] * (R - L + 1);
+              lz[gnode(node, 0)] = lz[node];
+              lz[gnode(node, 1)] = lz[node];
+              lz[node] = -1;
+              flp[node] = 0;
+       }
+       else if (flp[node])
+       {
+              sum[node] = (R - L + 1) - sum[node];
+              flp[node] = 0;
+
+              auto change = [&](int x) -> void {
+                     if (~lz[x])
+                     {
+                            lz[x] ^= 1;
+                     }
+                     else
+                     {
+                            flp[x] ^= 1;
+                     }
+              };
+              change(gnode(node, 0));
+              change(gnode(node, 1));
+       }
+}
+
+void pull(int node, ll L, ll R)
+{
+       sum[node] = sum[gnode(node, 0)] + sum[gnode(node, 1)];
+}
+
+void update(ll l, ll r, int v, int node, ll L, ll R)
+{
+       push(node, L, R);
+       if (l > R || r < L)
+              return;
+       if (L >= l && R <= r)
+       {
+              lz[node] = v;
+              flp[node] = 0;
+              push(node, L, R);
+              return;
+       }
+       ll mid = (L + R) >> 1ll;
+       update(l, r, v, gnode(node, 0), L, mid);
+       update(l, r, v, gnode(node, 1), mid + 1, R);
+       pull(node, L, R);
+}
+
+void flip(ll l, ll r, int node, ll L, ll R)
+{
+       push(node, L, R);
+       if (l > R || r < L || !node)
+              return;
+       if (L >= l && R <= r)
+       {
+              if (~lz[node])
+              {
+                     lz[node] ^= 1;
+                     push(node, L, R);
+              }
+              flp[node] ^= 1;
+              push(node, L, R);
+              return;
+       }
+       ll mid = (L + R) >> 1ll;
+       flip(l, r, gnode(node, 0), L, mid);
+       flip(l, r, gnode(node, 1), mid + 1, R);
+       pull(node, L, R);
+}
+
+ll query(int node, ll L, ll R)
+{
+       push(node, L, R);
+       if (!node || L == R)
+              return L;
+
+       ll iv = (R - L + 1) >> 1ll;
+
+       ll mid = (L + R) >> 1ll;
+       if (tree[node][0])
+       {
+              push(tree[node][0], L, mid);
+       }
+       push(tree[node][1], mid + 1, R);
+       ll lhs = (tree[node][0] ? sum[tree[node][0]] : 0);
+       ll rhs = (sum[tree[node][1]]);
+
+       if (lhs != iv)
+       {
+              return query(tree[node][0], L, mid);
+       }
+       else
+       {
+              return query(tree[node][1], mid + 1, R);
+       }
+       assert(0);
+}

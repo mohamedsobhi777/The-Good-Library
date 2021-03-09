@@ -1,0 +1,78 @@
+
+struct node
+{
+       int nxt[26], link, dep;
+       bool leaf;
+       node()
+       {
+              memset(nxt, 0, sizeof nxt);
+              leaf = 0, dep = 0, link = -1;
+       }
+       int &operator[](int x)
+       {
+              return nxt[x];
+       }
+};
+vector<node> aho(1);
+
+void add(string x)
+{
+       int cur = 0;
+       for (int j = 0; j < sz(x); ++j)
+       {
+              if (!aho[cur][x[j] - 'a'])
+              {
+                     aho[cur][x[j] - 'a'] = sz(aho);
+                     aho.pb(node());
+                     aho.back().dep = aho[cur].dep + 1;
+              }
+              cur = aho[cur][x[j] - 'a'];
+       }
+       aho[cur].leaf = 1;
+}
+
+void push_links()
+{
+       aho[0].link = 0;
+       queue<int> qu;
+       for (int j = 0; j < 26; ++j)
+       {
+              if (aho[0][j])
+              {
+                     aho[aho[0][j]].link = 0;
+                     qu.push(aho[0][j]);
+              }
+       }
+       while (sz(qu))
+       {
+              int tp = qu.front();
+              qu.pop();
+              for (int j = 0; j < 26; ++j)
+              {
+                     if (aho[tp][j])
+                     {
+                            int go = aho[tp].link;
+                            while (go && !aho[go][j])
+                            {
+                                   go = aho[go].link;
+                            }
+                            aho[aho[tp][j]].link = aho[go][j];
+                            qu.push(aho[tp][j]);
+                     }
+              }
+       }
+}
+
+const int N = 2e5;
+int dp[N][26];
+
+int get(int x, int v)
+{
+       if (~dp[x][v])
+              return dp[x][v];
+       if (!x)
+              return aho[x][v];
+       if (aho[x][v])
+              return dp[x][v] = aho[x][v];
+       return dp[x][v] = get(aho[x].link, v);
+}

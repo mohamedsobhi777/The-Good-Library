@@ -1,0 +1,82 @@
+struct node
+{
+       map<char, int> nxt, prv;
+       int link = -1, len = 0;
+       node()
+       {
+       }
+};
+
+vector<node> eer;
+int suff;
+
+bool extend(int i)
+{
+       int let = st[i];
+       int cur = suff;
+       while (1)
+       {
+              if (i - eer[cur].len - 1 >= 0 && st[i] == st[i - eer[cur].len - 1])
+                     break;
+              cur = eer[cur].link;
+       }
+       if (eer[cur].nxt[let])
+       {
+              suff = eer[cur].nxt[let];
+              return 0;
+       }
+
+       suff = sz(eer);
+       eer.push_back(node());
+       eer[cur].nxt[let] = suff;
+       eer[suff].len = 2 + eer[cur].len;
+
+       if (eer[suff].len == 1)
+       {
+              eer[suff].link = 1;
+              return 1;
+       }
+
+       while (1)
+       {
+              cur = eer[cur].link;
+              if (i - eer[cur].len - 1 >= 0 && st[i] == st[i - eer[cur].len - 1])
+              {
+                     eer[suff].link = eer[cur].nxt[let];
+                     break;
+              }
+       }
+
+       return 1;
+}
+
+void process()
+{
+       eer.push_back(node()), eer.push_back(node());
+       eer[0].link = 0, eer[1].link = 0;
+       eer[0].len = -1, eer[1].len = 0;
+}
+
+void print(int x)
+{
+       if (x < 2)
+              return;
+       if (eer[x].len == 1)
+       {
+              for (auto u : eer[x].prv)
+              {
+                     cout << u.f;
+                     return;
+              }
+       }
+       for (auto u : eer[x].prv)
+       {
+              if (eer[u.s].len + 2 == eer[x].len)
+              {
+                     cout << u.f;
+                     print(u.s);
+                     cout << u.f;
+                     break;
+              }
+       }
+}

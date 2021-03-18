@@ -1,0 +1,111 @@
+namespace L
+{ // LCT
+#define ls(o) ch[o][0]
+#define rs(o) ch[o][1]
+
+       int fa[N], ch[N][2], sz[N], vsz[N], w[N];
+       bool nroot(int x) { return ls(fa[x]) == x || rs(fa[x]) == x; }
+       void pushup(int x) { sz[x] = sz[ls(x)] + sz[rs(x)] + vsz[x] + w[x]; }
+
+       void rotate(int x)
+       {
+              int y = fa[x], z = fa[y], k = x == rs(y), w = ch[x][!k];
+              if (nroot(y))
+                     ch[z][y == rs(z)] = x;
+              ch[x][!k] = y, ch[y][k] = w;
+              if (w)
+                     fa[w] = y;
+              fa[y] = x, fa[x] = z;
+              pushup(y);
+       }
+       void splay(int x)
+       {
+              while (nroot(x))
+              {
+                     int y = fa[x], z = fa[y];
+                     if (nroot(y))
+                            rotate((x == ls(y)) ^ (y == ls(z)) ? x : y);
+                     rotate(x);
+              }
+              pushup(x);
+       }
+
+       void access(int x)
+       {
+              for (int y = 0; x; x = fa[y = x])
+                     splay(x), vsz[x] += sz[rs(x)] - sz[y], rs(x) = y, pushup(x);
+       }
+       void link(int x, int y)
+       {
+              ++x, ++y;
+              splay(y), access(x), splay(x);
+              fa[y] = x, vsz[x] += sz[y], sz[x] += sz[y];
+       }
+       void cut(int x, int y)
+       {
+              ++x, ++y;
+              access(y), splay(y), ls(y) = fa[x] = 0, pushup(y);
+       }
+
+#undef ls
+#undef rs
+}
+
+struct SuffixAutomata
+{
+       int size = 0, last = 0;
+       struct state
+       {
+              int size = 0, link = -1, cnt = 0, nxt[26];
+              state() { memset(nxt, 0, sizeof nxt); }
+              int &operator[](char c) { return nxt[c - 'a']; }
+       };
+       vector<state> st;
+
+       void extend(char x)
+       {
+              st.resize(st.size() + 2);
+              int cur = size++, p = last;
+              st[cur].size = st[last].size + 1, st[cur].cnt = 1;
+              L::w[cur + 1] = L::sz[cur + 1] = 1;
+              while (p != -1 && !st[p][x])
+                     st[p][x] = cur, p = st[p].link;
+              if (p == -1)
+                     st[cur].link = 0, L::link(0, cur);
+              else
+              {
+                     int q = st[p][x];
+                     if (st[p].size + 1 == st[q].size)
+                            st[cur].link = q, L::link(q, cur);
+                     else
+                     {
+                            int clone = size++;
+                            st[clone] = st[q], st[clone].size = st[p].size + 1, st[clone].cnt = 0;
+                            L::link(st[clone].link, clone);
+                            L::cut(st[q].link, q);
+                            L::link(clone, cur), L::link(clone, q);
+                            while (p != -1 && st[p][x] == q)
+                                   st[p][x] = clone, p = st[p].link;
+                            st[cur].link = st[q].link = clone;
+                     }
+              }
+              last = cur;
+       }
+       SuffixAutomata(string &s)
+       {
+              st = vector<state>((int)s.size() * 2, state()), ++size;
+              for (auto u : s)
+                     extend(u);
+       }
+       int follow(string acc)
+       {
+              int cur = 0;
+              for (auto u : acc)
+              {
+                     cur = st[cur][u];
+                     if (!cur)
+                            return 0;
+              }
+              return cur;
+       }
+};

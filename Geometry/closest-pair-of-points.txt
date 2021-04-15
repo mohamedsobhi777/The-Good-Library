@@ -1,0 +1,44 @@
+
+template <class T>
+struct point
+{
+       T x, y;
+       point() {}
+       point(T x, T y) : x(x), y(y) {}
+       T dist(point ohs) const
+       {
+              return (x - ohs.x) * (x - ohs.x) + (y - ohs.y) * (y - ohs.y);
+       }
+       bool operator<(point &ohs) const
+       {
+              return y < ohs.y;
+       }
+};
+
+long long closest_pairs(const vector<P> &points, const vector<P> &points_by_y)
+{
+       if (sz(points) <= 1)
+              return numeric_limits<long long>::max();
+       int z = sz(points);
+       vector<P> lhs(points.begin(), points.begin() + z / 2);
+       vector<P> rhs(points.begin() + z / 2, points.end());
+       vector<P> lhs_y, rhs_y;
+       for (P p : points_by_y)
+       {
+              if (make_pair(p.x, p.y) <= make_pair(lhs.back().x, lhs.back().y))
+                     lhs_y.pb(p);
+              else
+                     rhs_y.pb(p);
+       }
+       long double middle_x = lhs.back().x;
+       long long d1 = closest_pairs(lhs, lhs_y), d2 = closest_pairs(rhs, rhs_y);
+       long long d = min(d1, d2), ret = d;
+       vector<P> stripe;
+       for (P p : points_by_y)
+              if ((middle_x - p.x) * (middle_x - p.x) < d)
+                     stripe.pb(p);
+       for (int i = 0; i < (int)stripe.size(); ++i)
+              for (int j = i - 1; j >= 0 && (stripe[i].y - stripe[j].y) * (stripe[i].y - stripe[j].y) < d; --j)
+                     ret = min(ret, stripe[i].dist(stripe[j]));
+       return ret;
+}

@@ -1,0 +1,17 @@
+// get primes for up to 3e8
+bitset<(int)1e8+1> bts ; 
+
+void prime(int x){
+}
+
+void fast_sieve(){
+       prime(2) ; prime(3) ; 
+       for(int i = 5, t = 2 ;i <= n ; i += t, t = 6 - t){
+              if(bts[i/3])continue; 
+              prime(i) ; 
+              if(i>(n+i-1)/i)continue; 
+              for(int j = i*i, v = t; j <=n ; j += v*i, v = 6 - v){
+                     bts[j/3] = 1 ;
+              }
+       }
+}

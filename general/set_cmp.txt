@@ -1,0 +1,5 @@
+struct cmp
+{
+       bool operator()(int i, int j) { return W[i] != W[j] ? W[i] < W[j] : i < j; };
+};
+typedef set<int, cmp> set_el_col;

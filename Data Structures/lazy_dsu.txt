@@ -1,0 +1,26 @@
+struct dsu
+{
+       int fat[N], mark[N], pass;
+       dsu() {}
+       void init() { ++pass; }
+       int find(int x)
+       {
+              prop(x);
+              return fat[x] = x == fat[x] ? x : find(fat[x]);
+       }
+       bool link(int u, int v)
+       {
+              u = find(u), v = find(v);
+              if (u == v)
+                     return 0;
+              fat[u] = v;
+              return 1;
+       }
+       bool same(int u, int v) { return find(u) == find(v); }
+       void prop(int x)
+       {
+              if (mark[x] == pass)
+                     return;
+              mark[x] = pass, fat[x] = x;
+       }
+} lazy_dsu;

@@ -1,0 +1,7 @@
+struct
+{
+       int mark[N], pass;
+       void init() { ++pass; }
+       int get(int x) { return mark[x] == pass; }
+       int set(int x) { return mark[x] = pass; }
+} flag;

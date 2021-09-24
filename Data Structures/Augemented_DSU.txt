@@ -1,0 +1,42 @@
+struct Aug_DSU{
+       int fat[N], pref[N], mark[N], pass = 0 ; 
+       void reset(int n){
+       	for(int i = 0 ;i <= n; ++ i){
+       		fat[i] = i ; 
+       		pref[i] = 0 ; 
+       	}
+       }
+       Aug_DSU(){
+       	reset(N - 1) ; 
+       }
+       void prop(int x){
+              if(mark[x] != pass){
+                     fat[x] = x ; 
+                     pref[x] = 0 ; 
+                     mark[x] = pass ;
+              }
+       }
+       void init(){
+              ++ pass ;
+       }
+       int find(int x){
+              prop(x) ; 
+       	if(x == fat[x])return x ; 
+              int root = find(fat[x]) ; 
+       	pref[x] = pref[x] + pref[ fat[x] ] ; 
+       	return fat[x] = root ; 
+       }
+
+       void link(int u, int v, int d){
+       	// assertion u - v = d
+       	int pu = find(u) ; 
+       	int pv = find(v) ;
+       	if(pu == pv){
+       		// assert(pref[u] - pref[v] == d) ; 
+       	}else{
+       		fat[pu] = pv ; 
+       		pref[pu] = pref[v] - pref[u] + d ; 
+       	}
+       }
+
+} ;

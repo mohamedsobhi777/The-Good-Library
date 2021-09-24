@@ -1,0 +1,41 @@
+template <class T>
+struct BIT
+{
+       T M[N], A[N];
+       void reset(int n)
+       {
+              memset(M, 0, sizeof(M[0]) * (n + 1));
+              memset(A, 0, sizeof(A[0]) * (n + 1));
+       }
+       BIT()
+       {
+              reset(N - 1);
+       }
+       void update(int i, T mul, T add)
+       {
+              while (i < N)
+              {
+                     M[i] += mul;
+                     A[i] += add;
+                     i |= (i + 1);
+              }
+       }
+       void upd(int l, T r, T x)
+       {
+              update(l, x, -x * (l - 1));
+              update(r, -x, x * r);
+       }
+       T query(int i)
+       {
+              T mul = 0, add = 0;
+              int st = i;
+              while (i >= 0)
+              {
+                     mul += M[i];
+                     add += A[i];
+                     i = (i & (i + 1)) - 1;
+              }
+              return T(mul * st + add);
+       }
+       inline T query(int l, int r){return query(r) - query(l - 1);}
+};

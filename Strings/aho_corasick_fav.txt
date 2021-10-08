@@ -1,0 +1,50 @@
+struct node{
+       int nxt[26], link = -1, dlink = 0 ; 
+       node(){
+              memset(nxt,0,sizeof nxt) ; 
+       }
+       int &operator[](char c){return nxt[c-'a'] ;}
+} ;
+ 
+vector<node> aho(1); 
+ 
+void insert(string x, int ix){
+       int cur = 0 ; 
+       for(auto u : x){
+              if(!aho[cur][u]){
+                     aho[cur][u] = (int) aho.size() ;
+                     aho.push_back(node()) ; 
+              }
+              cur = aho[cur][u] ; 
+       }
+       leaf[cur] = ix ; 
+}
+ 
+void push_links(){
+       queue<int> qu ; 
+       aho[0].link = 0 ; 
+       for(int i = 'a' ; i <= 'z' ; ++ i){
+              int kid = aho[0][i] ; 
+              if(kid){
+                     aho[kid].link = 0 ; 
+                     qu.push(kid) ; 
+              }
+       }
+ 
+       while(qu.size()){
+              int no = qu.front() ; 
+              qu.pop() ; 
+              for(int j = 'a' ; j <= 'z' ; ++ j){
+                     int kid = aho[no][j] ; 
+                     if(kid){
+                            int par = aho[no].link ;
+                            while(par && !aho[par][j])
+                                   par = aho[par].link ; 
+                            par = aho[par][j] ; 
+                            aho[kid].link = par ; 
+                            aho[kid].dlink = (~leaf[par]?par:aho[par].dlink) ; 
+                            qu.push(kid) ; 
+                     }
+              }
+       }
+}

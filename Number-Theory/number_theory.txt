@@ -1,0 +1,15 @@
+namespace number_theory{
+
+       const int mod1 = 1e9 + 7 ; 
+
+       template<class T> 
+       T Add(T &x, T y, bool inplace = false, T MOD = mod1){
+              T ret = (x + y) ; 
+              (ret>=MOD)&&(ret-=MOD) ; 
+              (ret<0)&&(ret+=MOD) ; 
+              if(inplace)x = ret ; 
+              return ret ;   
+       }       
+}
+
+using namespace number_theory ; 

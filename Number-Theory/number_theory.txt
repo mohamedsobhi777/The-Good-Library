@@ -11,6 +11,13 @@ namespace number_theory{
               return ret ;   
        }       
 
+       template<class T>
+       T Mul(T &x, T y, bool inplace = false, T MOD = mod1){
+              T ret = (T) x * y % MOD; 
+              if(inplace)x = ret ; 
+              return ret ;   
+       }   
+
        bool is_prime(long long x){
               if(x<=1)return false ; 
               if(x<=3)return true ; 
@@ -24,6 +31,17 @@ namespace number_theory{
               }
 
               return true ; 
+       }
+
+       template<class T> 
+       T faspow(T x, T y, T MOD = mod1){
+              T ret = T(1) ; 
+              while(y){
+                     (y&1) && (Mul(ret, x, true, MOD)) ; 
+                     Mul(x, x, true, MOD) ; 
+                     y >>= 1ll ; 
+              }
+              return ret ; 
        }
 }
 

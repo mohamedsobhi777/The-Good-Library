@@ -1,6 +1,7 @@
 namespace number_theory{
 
        const int mod1 = 1e9 + 7 ;
+       const int mod2 = 998244353 ; 
 
        vector<int> fact ;
 

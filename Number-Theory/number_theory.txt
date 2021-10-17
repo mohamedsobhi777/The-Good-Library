@@ -69,7 +69,7 @@ namespace number_theory{
                      fact = {1} ; 
               }
               const int z = fact.size() ; 
-              fact.resize(n) ; 
+              fact.resize(n + 1) ; 
               for(int i = z;i <= n ; ++ i){
                      fact[i] = Mul(fact[i-1], i) ; 
               }

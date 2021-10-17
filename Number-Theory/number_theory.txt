@@ -3,7 +3,7 @@ namespace number_theory{
        const int mod1 = 1e9 + 7 ;
        const int mod2 = 998244353 ; 
 
-       vector<int> fact ;
+       vector<long long> fact ;
 
        template<typename T>
        T normalize(T a, T m){
@@ -21,7 +21,7 @@ namespace number_theory{
        }
 
        template<typename T>
-       T Add_inplace(T &x, T y, T MOD = mod1){
+       void Add_inplace(T &x, T y, T MOD = mod1){
               x = Add(x, y, MOD) ; 
        }       
 
@@ -33,7 +33,7 @@ namespace number_theory{
        }       
 
        template<typename T> 
-       T Mul_inplace(T &x, T y, T MOD = mod1){
+       void Mul_inplace(T &x, T y, T MOD = mod1){
               x = Mul(x, y, MOD) ; 
        }   
 
@@ -63,15 +63,20 @@ namespace number_theory{
               return ret ; 
        }
 
-       void generate_factorials(int n){
-              if(fact.size() > n)return ; 
+       void generate_factorials(int _n){
+                     fact.push_back(1) ; 
+              for(int i = 1;i <= n ;++ i){
+                     fact.push_back(Mul(fact.back(), 1ll * i)) ; 
+              }
+              return ; 
+              if(fact.size() > _n)return ; 
               if(fact.size() == 0){
                      fact = {1} ; 
               }
               const int z = fact.size() ; 
-              fact.resize(n + 1) ; 
-              for(int i = z;i <= n ; ++ i){
-                     fact[i] = Mul(fact[i-1], i) ; 
+              fact.resize(_n + 1) ; 
+              for(int i = z;i <= _n ; ++ i){
+                     fact[i] = Mul(fact[i-1], 1ll *i) ; 
               }
        }
 
@@ -84,9 +89,16 @@ namespace number_theory{
                      m -= t * a; swap(a, m);
                      u -= t * v; swap(u, v);
               }
+
               assert(m == 1);
               return normalize(u, MOD);
        }
+
+       template<typename T> 
+       T ncr(T x, T y, T MOD = mod1){
+              if(x<y)return T(0); 
+              return Mul( fact[x], Mul( inverse(fact[y], T(MOD) ) , inverse(fact[x-y], T(MOD) ) ) ) ; 
+       }
 }
 
-using namespace number_theory ; 
+using namespace number_theory ;

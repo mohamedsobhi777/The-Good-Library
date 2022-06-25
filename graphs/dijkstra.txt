@@ -1,0 +1,25 @@
+vector<long long> dijkstra(int sz, int src){
+       vector<long long> ret (sz, 1e18) ; 
+
+       priority_queue<pair<long long,int> > pq ; 
+
+       pq.push({0, src}) ; 
+       ret[src] = 0 ;
+
+       while(pq.size()){
+              long long dist = -pq.top().first ;
+              int node = pq.top().second ;
+              pq.pop() ; 
+              if(dist > ret[node])
+                     continue; 
+              for(auto u : adj[node]){
+
+                     if(dist + u.second < ret[u.first]){
+                            ret[u.first] = dist + u.second ; 
+                            pq.push({-ret[u.first], u.first}) ; 
+                     }
+              }
+       } 
+       for(auto &u : ret)if(u == 1e18)u = -1 ;
+       return ret ; 
+}
